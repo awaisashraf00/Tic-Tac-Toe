@@ -1,25 +1,44 @@
 #include <iostream>
 #include <unordered_map>
-using namespace std;
+#include "raylib.h"
 
+using namespace std;
 unordered_map<int,char> board;
 
-void print_board();
+int cell_size {100};
+
+void Display_board();
 bool check_winner(char player);
 bool complete_game();
 
 int game(char player);
 
 int main() {
-    for (int i = 1; i <= 9; i++)
-        board[i] = '.';
 
-    game('X');
+    for (int i = 1; i <= 9; i++){
+        board[i] = '.';
+    }
+    SetTargetFPS(60);
+    InitWindow(300,300,"Mini_maX");
+
+    ClearBackground({255,255,255});
+    
+    while (!WindowShouldClose())
+    {
+        BeginDrawing();
+        if(!complete_game()){
+            Display_board();
+        }
+        EndDrawing();
+        
+    }
+    CloseWindow();
+    
 }
 
 int game(char player) {
 
-    print_board();
+
 
     if (check_winner(player == 'X' ? '0' : 'X')) {
         cout << "Player " << (player == 'X' ? '0' : 'X') << " wins!\n";
@@ -45,6 +64,7 @@ int game(char player) {
     return game(player == 'X' ? '0' : 'X');
 }
 
+
 bool check_winner(char p) {
     int win[8][3] = {
         {1,2,3},{4,5,6},{7,8,9},
@@ -68,12 +88,10 @@ bool complete_game(){
     return true;
 }
 
-void print_board(){
-    cout << "\n";
-    cout << board[1] << " | " << board[2] << " | " << board[3] << endl;
-    cout << "--+---+--\n";
-    cout << board[4] << " | " << board[5] << " | " << board[6] << endl;
-    cout << "--+---+--\n";
-    cout << board[7] << " | " << board[8] << " | " << board[9] << endl;
-    cout << "\n";
+void Display_board(){
+    for(int i{0};i<3;i++){
+        for(int j{0};j<0;j++){   
+            DrawRectangle(cell_size * i,cell_size * j,cell_size - 1,cell_size - 1,{128,128,128});
+        }
+    }
 }
