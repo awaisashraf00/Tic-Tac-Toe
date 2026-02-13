@@ -6,13 +6,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(Algorithm source/tictactoe.cpp)
 
-target_include_directories(Algorithm PRIVATE ${CMAKE_SOURCE_DIR}/source ${CMAKE_SOURCE_DIR}/lib)
+target_include_directories(Algorithm PRIVATE ${CMAKE_SOURCE_DIR}/source
+${CMAKE_SOURCE_DIR}/lib)
+
+find_package(raylib REQUIRED)
 
 # Link libraries
-target_link_libraries(Algorithm
-    ${CMAKE_SOURCE_DIR}/lib/libraylib.a
-    "-framework OpenGL"
-    "-framework Cocoa"
-    "-framework IOKit"
-    "-framework CoreVideo"
-)
+
+target_link_libraries(Algorithm PRIVATE raylib)
