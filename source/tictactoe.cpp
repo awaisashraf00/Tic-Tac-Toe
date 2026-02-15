@@ -14,60 +14,62 @@ int cell_size {100};
 
 // Sary main functions jo game ka andar use karny hain
 void Display_board(int current_pos);
-bool check_winner(char player);
-bool complete_game(char player);
 void game_input(char &player);
+void Insert_input(int pos, char player);
+void computer_move();
+int mini_max(bool maxi);
+bool check_winner(char player);
+bool complete_game();
 
 
 int current_pos = 5;
+bool p_put = true;
 
-bool game_ended = false;
+
+char p = 'X';
+char computer = 'O';
+
 int main() {
     
     for (int i = 1; i <= 9; i++){
         board[i].first = '.';
         board[i].second = 0;
     }
-    
-    char p = 'X';
 
     //game start
     SetTargetFPS(60);
-    InitWindow(300,400,"Mini_maX");
+    InitWindow(300,300,"Mini_maX");
 
     while (!WindowShouldClose())
     {
         BeginDrawing();
         ClearBackground(WHITE);
         
-        if(!game_ended && !complete_game(p) && !check_winner(p)){
-            char prev_player = p;
+        if(!complete_game() && !check_winner(p) && !check_winner(computer)){
+            
             game_input(p);
             Display_board(current_pos);
             
-            string cell_str(1,p);
-            string player_text = "Current Player: " + cell_str;
-            DrawText(player_text.c_str(), (100/2)+20 , 340, 20 , BLACK);
-
-            if(check_winner(prev_player) || complete_game(p)){
-                game_ended = true;
+            if(!p_put){
+                
+                computer_move();
+                Display_board(current_pos);
+                
             }
-        }
-        if(game_ended){ 
-            Display_board(current_pos);
-            char winner = (p == 'X') ? 'O' : 'X';
-            if(check_winner(winner)){
-                string winner_text = string(1, winner) + " IS the winner";
-                DrawText(winner_text.c_str(),(100/2)+20 , 340, 20 ,BLACK);
+        }else{
+            ClearBackground(RED);
+            if(complete_game()){
+                DrawText("DRAW",100,125,50,BLACK);
             }else{
-                DrawText("GAME_OVER" , (100/2)+20 , 340, 20 , BLACK);
+                DrawText(check_winner(p)?"HUMAN WINS ":"COMPUTER WINS",100,150,20,BLACK);
             }
         }
+        
+
         EndDrawing();
         
     }
     CloseWindow();
-    
 }
 
 void game_input( char &player) {
@@ -89,14 +91,101 @@ void game_input( char &player) {
         if(current_pos > 9) current_pos = 9;
     }
     if(IsKeyPressed(KEY_ENTER)){
-        if(current_pos >= 1 && current_pos <= 9 && board[current_pos].first == '.') {
-            board[current_pos].first = player;
-            board[current_pos].second = (player == 'X') ? 1:2;
-            player = (player == 'X') ? 'O' : 'X';
-        }
+        Insert_input(current_pos,player);
+        p_put = false;
     }
 }
 
+void Insert_input(int pos ,char player){
+    if(board[pos].first == '.'){ 
+        board[pos].first = player;
+        board[pos].second = (player == 'X') ? 1:2;
+    }
+
+}
+int  i = 0;
+void computer_move(){
+    i++;
+    double best = 100;
+    int best_move = 0;
+    for(int i{1};i<=9;i++){
+        if(board[i].first == '.'){
+            
+            board[i].first = computer;
+            board[i].second = 2;
+            
+            int current_score = mini_max(true);
+
+            board[i].first = '.';
+            board[i].second = 0;
+
+            if(current_score < best){
+                best = current_score;
+                best_move = i;
+            }
+        }
+    }
+    Insert_input(best_move,computer);
+    p_put = true;
+}
+
+// [o,x, ]
+// [ ,x,o]
+// [ ,o,x]
+
+int mini_max(bool maxi){
+    // if(i==3){
+    //     BeginDrawing();
+    //     Display_board(current_pos);
+    //     EndDrawing();
+    // }
+    if( check_winner(p)) return 1;
+    else if (check_winner(computer)) return -1;
+    else if  (complete_game()) return 0;
+
+    if (maxi){
+        
+        double best = -100;
+        for(int i{1};i<=9;i++){
+            if(board[i].first == '.'){
+
+                board[i].first = p;
+                board[i].second = 1;
+                
+                int current_score = mini_max(false);
+                
+                board[i].first = '.';
+                board[i].second = 0;
+
+                if(current_score > best){
+                    best = current_score;
+                }
+            }
+        }
+        return best; 
+    }
+    else{
+
+        double best = 100;
+        for(int i{1};i<=9;i++){
+            if(board[i].first == '.'){
+
+                board[i].first = computer;
+                board[i].second = 2;
+                
+                int current_score = mini_max(true);
+                
+                board[i].first = '.';
+                board[i].second = 0;
+
+                if(current_score < best){
+                    best = current_score;
+                }
+            }
+        }
+        return best;
+    }
+}
 
 bool check_winner(char p) {
     int win[8][3] = {
@@ -112,7 +201,7 @@ bool check_winner(char p) {
     return false;
 }
 
-bool complete_game(char p){
+bool complete_game(){
     for (int i{1};i<=9;i++){
         if (board[i].first=='.'){
             return false;
