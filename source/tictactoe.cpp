@@ -58,12 +58,13 @@ int main() {
             }
         }else{
             ClearBackground(RED);
-            if(complete_game()){
-                DrawText("DRAW",100,125,50,BLACK);
-            }else{
-                DrawText(check_winner(p)?"HUMAN WINS ":"COMPUTER WINS",100,150,20,BLACK);
-            }
-        }
+            // if(complete_game()){
+                //     DrawText("DRAW",100,125,50,BLACK);
+                // }else{
+                    //     DrawText(check_winner(p)?"HUMAN WINS ":"COMPUTER WINS",100,150,20,BLACK);
+                    // }
+                }
+                Display_board(current_pos);
         
 
         EndDrawing();
@@ -103,9 +104,10 @@ void Insert_input(int pos ,char player){
     }
 
 }
-int  i = 0;
+
+
 void computer_move(){
-    i++;
+    
     double best = 100;
     int best_move = 0;
     for(int i{1};i<=9;i++){
@@ -134,11 +136,9 @@ void computer_move(){
 // [ ,o,x]
 
 int mini_max(bool maxi){
-    // if(i==3){
-    //     BeginDrawing();
-    //     Display_board(current_pos);
-    //     EndDrawing();
-    // }
+    BeginDrawing();
+    Display_board(current_pos);
+    EndDrawing();
     if( check_winner(p)) return 1;
     else if (check_winner(computer)) return -1;
     else if  (complete_game()) return 0;
